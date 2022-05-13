@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [ ! -z "$WWWUSER" ]; then
+    usermod -u $WWWUSER sail
+fi
+
+if [ ! -d /.composer ]; then
+    mkdir /.composer
+fi
+
+chmod -R ugo+rw /.composer
+
+if [ $# -gt 0 ]; then
+    exec gosu $WWWUSER "$@"
+else
+    npm install --save-dev chokidar
+    /usr/bin/php -d variables_order=EGPCS /var/www/html/artisan octane:start --watch --server=swoole --host=0.0.0.0 --port=80
+fi
